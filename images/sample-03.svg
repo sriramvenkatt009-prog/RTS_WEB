@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Event lights">
+  <rect width="1200" height="900" fill="#17202a"/>
+  <path d="M170 0 L420 900" stroke="#8ed7ba" stroke-width="150" opacity=".55"/>
+  <path d="M1010 0 L710 900" stroke="#d35f45" stroke-width="170" opacity=".68"/>
+  <path d="M580 0 L610 900" stroke="#f0bb4f" stroke-width="120" opacity=".65"/>
+  <circle cx="260" cy="685" r="72" fill="#ffffff" opacity=".9"/>
+  <circle cx="595" cy="610" r="92" fill="#ffffff" opacity=".88"/>
+  <circle cx="910" cy="700" r="64" fill="#ffffff" opacity=".9"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Robotics project prototype">
+  <rect width="1200" height="900" fill="#eef4f7"/>
+  <rect x="165" y="135" width="870" height="620" rx="30" fill="#ffffff"/>
+  <rect x="285" y="280" width="630" height="300" rx="24" fill="#17202a"/>
+  <circle cx="420" cy="430" r="72" fill="#f4c430"/>
+  <circle cx="780" cy="430" r="72" fill="#f4c430"/>
+  <rect x="525" y="540" width="150" height="44" rx="22" fill="#d35f45"/>
+  <path d="M350 250 V185 M850 250 V185" stroke="#b98500" stroke-width="28" stroke-linecap="round"/>
+  <rect x="405" y="650" width="390" height="34" rx="17" fill="#d8e1ea"/>
+</svg>

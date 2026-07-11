@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Corporate collaboration meeting">
+  <rect width="1200" height="900" fill="#fff4c2"/>
+  <rect x="130" y="150" width="940" height="560" rx="34" fill="#ffffff"/>
+  <circle cx="360" cy="340" r="82" fill="#f4c430"/>
+  <circle cx="600" cy="340" r="82" fill="#17202a"/>
+  <circle cx="840" cy="340" r="82" fill="#d35f45"/>
+  <path d="M285 560 C335 480 385 480 435 560" stroke="#f4c430" stroke-width="42" stroke-linecap="round"/>
+  <path d="M525 560 C575 480 625 480 675 560" stroke="#17202a" stroke-width="42" stroke-linecap="round"/>
+  <path d="M765 560 C815 480 865 480 915 560" stroke="#d35f45" stroke-width="42" stroke-linecap="round"/>
+  <path d="M455 340 H505 M695 340 H745" stroke="#b98500" stroke-width="24" stroke-linecap="round"/>
+  <rect x="275" y="650" width="650" height="34" rx="17" fill="#d8e1ea"/>
+</svg>

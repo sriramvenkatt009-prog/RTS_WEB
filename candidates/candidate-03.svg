@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Group of successful candidates">
+  <rect width="1200" height="900" fill="#17202a"/>
+  <circle cx="330" cy="300" r="92" fill="#f4c430"/>
+  <circle cx="600" cy="250" r="105" fill="#ffffff"/>
+  <circle cx="870" cy="300" r="92" fill="#d35f45"/>
+  <path d="M190 705 C245 530 415 530 470 705" fill="#f4c430"/>
+  <path d="M430 705 C500 500 700 500 770 705" fill="#ffffff"/>
+  <path d="M730 705 C785 530 955 530 1010 705" fill="#d35f45"/>
+  <rect x="350" y="770" width="500" height="34" rx="17" fill="#fff4c2"/>
+</svg>

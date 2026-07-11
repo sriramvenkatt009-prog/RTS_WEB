@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Placed candidate success">
+  <rect width="1200" height="900" fill="#fff4c2"/>
+  <circle cx="600" cy="300" r="120" fill="#f4c430"/>
+  <path d="M385 685 C455 520 745 520 815 685" fill="#17202a"/>
+  <rect x="240" y="720" width="720" height="44" rx="22" fill="#b98500"/>
+  <path d="M265 215 H430 M770 215 H935" stroke="#d35f45" stroke-width="32" stroke-linecap="round"/>
+  <path d="M500 455 H700" stroke="#ffffff" stroke-width="28" stroke-linecap="round"/>
+</svg>

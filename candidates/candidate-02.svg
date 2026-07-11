@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Candidate job offer">
+  <rect width="1200" height="900" fill="#f7faf9"/>
+  <rect x="190" y="140" width="820" height="620" rx="34" fill="#ffffff"/>
+  <rect x="285" y="230" width="420" height="48" rx="24" fill="#17202a"/>
+  <rect x="285" y="330" width="560" height="32" rx="16" fill="#d8e1ea"/>
+  <rect x="285" y="405" width="500" height="32" rx="16" fill="#d8e1ea"/>
+  <rect x="285" y="505" width="250" height="76" rx="18" fill="#f4c430"/>
+  <path d="M665 610 L755 700 L935 470" stroke="#d35f45" stroke-width="48" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

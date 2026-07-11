@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Software project dashboard">
+  <rect width="1200" height="900" fill="#fff6cf"/>
+  <rect x="130" y="130" width="940" height="640" rx="32" fill="#ffffff"/>
+  <rect x="190" y="205" width="820" height="92" rx="18" fill="#17202a"/>
+  <rect x="210" y="365" width="240" height="250" rx="18" fill="#f4c430"/>
+  <rect x="505" y="365" width="240" height="250" rx="18" fill="#d8e1ea"/>
+  <rect x="800" y="365" width="190" height="250" rx="18" fill="#d35f45"/>
+  <path d="M250 675 H950" stroke="#b98500" stroke-width="28" stroke-linecap="round"/>
+</svg>

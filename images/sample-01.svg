@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Yellow technology and career growth design">
+  <rect width="1200" height="900" fill="#fff6cf"/>
+  <path d="M0 0 H1200 V900 H0 Z" fill="#fff6cf"/>
+  <path d="M0 665 C190 565 330 565 515 635 C735 720 930 540 1200 590 L1200 900 L0 900 Z" fill="#f4c430"/>
+  <path d="M0 760 C220 630 430 690 610 748 C830 820 990 690 1200 725 L1200 900 L0 900 Z" fill="#d6a400"/>
+
+  <circle cx="950" cy="170" r="92" fill="#ffd95a"/>
+  <circle cx="950" cy="170" r="132" fill="none" stroke="#f4c430" stroke-width="18" opacity=".36"/>
+
+  <g opacity=".94">
+    <rect x="135" y="150" width="480" height="330" rx="28" fill="#ffffff"/>
+    <rect x="180" y="205" width="240" height="34" rx="17" fill="#121820"/>
+    <rect x="180" y="278" width="350" height="28" rx="14" fill="#f4c430"/>
+    <rect x="180" y="338" width="300" height="28" rx="14" fill="#d8e1ea"/>
+    <rect x="180" y="398" width="210" height="28" rx="14" fill="#d8e1ea"/>
+  </g>
+
+  <g fill="none" stroke="#121820" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" opacity=".88">
+    <path d="M705 495 V355"/>
+    <path d="M705 355 L635 425"/>
+    <path d="M705 355 L775 425"/>
+    <path d="M875 495 V285"/>
+    <path d="M875 285 L800 360"/>
+    <path d="M875 285 L950 360"/>
+    <path d="M1045 495 V210"/>
+    <path d="M1045 210 L970 285"/>
+    <path d="M1045 210 L1120 285"/>
+  </g>
+
+  <g>
+    <circle cx="705" cy="535" r="42" fill="#ffffff"/>
+    <circle cx="875" cy="535" r="42" fill="#ffffff"/>
+    <circle cx="1045" cy="535" r="42" fill="#ffffff"/>
+    <path d="M660 640 C690 600 720 600 750 640" stroke="#ffffff" stroke-width="28" stroke-linecap="round"/>
+    <path d="M830 640 C860 600 890 600 920 640" stroke="#ffffff" stroke-width="28" stroke-linecap="round"/>
+    <path d="M1000 640 C1030 600 1060 600 1090 640" stroke="#ffffff" stroke-width="28" stroke-linecap="round"/>
+  </g>
+
+  <path d="M120 665 H1120" stroke="#121820" stroke-width="14" stroke-linecap="round" opacity=".22"/>
+  <path d="M155 720 H520" stroke="#ffffff" stroke-width="18" stroke-linecap="round" opacity=".72"/>
+</svg>

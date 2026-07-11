@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Training partnership network">
+  <rect width="1200" height="900" fill="#17202a"/>
+  <circle cx="260" cy="260" r="86" fill="#f4c430"/>
+  <circle cx="600" cy="450" r="110" fill="#ffffff"/>
+  <circle cx="940" cy="260" r="86" fill="#d35f45"/>
+  <circle cx="345" cy="680" r="78" fill="#ffffff"/>
+  <circle cx="855" cy="680" r="78" fill="#f4c430"/>
+  <path d="M335 300 L505 395 M695 395 L865 300 M525 540 L405 625 M675 540 L795 625" stroke="#fff4c2" stroke-width="24" stroke-linecap="round"/>
+  <rect x="470" y="430" width="260" height="42" rx="21" fill="#17202a"/>
+</svg>
