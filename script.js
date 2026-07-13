@@ -52,12 +52,20 @@ function startMarquees() {
   document.querySelectorAll(".marquee-track").forEach((track) => {
     const windowElement = track.closest(".marquee-window");
     const cards = Array.from(track.querySelectorAll(".gallery-image"));
-    const originalCount = cards.length / 2;
+    const originalCount = Math.floor(cards.length / 2);
     const firstCard = cards[0];
     if (!windowElement || !firstCard || !originalCount) return;
 
     track.querySelectorAll("img").forEach((image) => {
-      image.addEventListener("error", () => image.closest(".gallery-image")?.remove(), { once: true });
+      image.addEventListener("error", () => {
+        const failedSource = image.getAttribute("src");
+        track.querySelectorAll("img").forEach((candidate) => {
+          if (candidate.getAttribute("src") === failedSource) {
+            candidate.closest(".gallery-image")?.remove();
+          }
+        });
+        if (track.isConnected) startMarquees();
+      }, { once: true });
     });
 
     let current = 0;
@@ -71,6 +79,7 @@ function startMarquees() {
 
     moveToCenter(false);
     const advance = () => {
+      if (!track.isConnected) return;
       current += 1;
       moveToCenter(true);
       if (current === originalCount) {
