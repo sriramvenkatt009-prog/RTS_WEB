@@ -58,17 +58,27 @@ function startMarquees(galleries) {
       const batch = imageElements.map((_, offset) => gallery.images[(current + offset) % gallery.images.length]);
       Promise.all(batch.map((image) => loadDriveImage(image))).then((loaded) => {
         if (!section.isConnected) return;
-        imageElements.forEach((element) => element.classList.remove("is-visible"));
+        imageElements.forEach((element) => {
+          element.classList.remove("is-visible");
+          element.classList.add("is-leaving");
+        });
         marqueeTimers.push(window.setTimeout(() => {
           loaded.forEach((image, index) => {
             const element = imageElements[index];
             if (image) {
               element.src = image.source;
               element.alt = image.name;
-              element.classList.add("is-visible");
+              element.classList.remove("is-leaving");
+              element.classList.add("is-arriving");
             } else {
               element.removeAttribute("src");
             }
+          });
+          window.requestAnimationFrame(() => {
+            imageElements.forEach((element) => {
+              element.classList.remove("is-arriving");
+              element.classList.add("is-visible");
+            });
           });
           const last = Math.min(current + imageElements.length, gallery.images.length);
           status.textContent = `Images ${current + 1}–${last} of ${gallery.images.length}`;
