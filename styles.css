@@ -46,3 +46,9 @@ dialog { width:min(900px,92vw); padding:0; border:0; border-radius:16px; overflo
 .gallery-image img { object-fit:contain; transform:none; }
 .gallery-image:hover img { transform:none; }
 @media (max-width:760px) { .gallery-image { flex-basis:285px; width:285px; height:300px; } }
+
+/* One dependable Drive image per folder: no wide track or off-screen cards. */
+.marquee-window { display:grid; min-height:540px; place-items:center; }
+.marquee-image { display:block; width:min(96%,760px); height:min(500px,calc(100vw * .45)); min-height:320px; object-fit:contain; border:7px solid #fff; border-radius:12px; background:#f1f4f5; box-shadow:0 9px 20px rgba(23,32,42,.15); opacity:0; transition:opacity .35s ease; }
+.marquee-image.is-visible { opacity:1; }.marquee-status { margin:12px 0 0; color:#7a5900; font-size:.85rem; font-weight:800; }
+@media (max-width:760px) { .marquee-window { min-height:350px; }.marquee-image { width:96%; height:300px; min-height:0; } }

@@ -32,78 +32,47 @@ function readableName(file) {
 }
 
 async function renderGalleries() {
-  if (!galleryRoot.children.length) {
-    galleryRoot.innerHTML = '<p class="gallery-loading">Preparing gallery images…</p>';
-  }
-  const sourceGalleries = await getDriveGalleries() || await getLocalGalleries();
-  const galleries = await preloadGalleries(sourceGalleries);
+  const galleries = await getDriveGalleries() || await getLocalGalleries();
   renderDriveMenu(galleries);
   galleryRoot.innerHTML = galleries.map(({ title, images }) => {
     const id = `gallery-${slugify(title)}`;
     if (!images.length) return `<section><div class="gallery-group-header"><h3>${title}</h3></div><p class="gallery-empty">Images will appear here soon.</p></section>`;
-    const imageButtons = images.map(({ source, name }) => {
-      return `<button class="gallery-image" type="button" data-source="${source}" data-caption="${name}" aria-label="Open ${name}"><img src="${source}" alt="${name}" loading="eager"></button>`;
-    }).join("");
-    return `<section id="${id}" class="drive-gallery"><div class="gallery-group-header"><h3>${title}</h3><span>${images.length} images</span></div><div class="marquee-window"><div class="marquee-track">${imageButtons}</div></div></section>`;
+    return `<section id="${id}" class="drive-gallery"><div class="gallery-group-header"><h3>${title}</h3><span>${images.length} images</span></div><div class="marquee-window"><img class="marquee-image" alt="${title}"><p class="marquee-status">Loading images…</p></div></section>`;
   }).join("");
-  startMarquees();
+  startMarquees(galleries);
 }
 
-async function preloadGalleries(galleries) {
-  const results = await Promise.all(galleries.map(async (gallery) => {
-    const imageResults = await Promise.all(gallery.images.map(({ source }) => preloadImage(source)));
-    return imageResults.every(Boolean) ? gallery : null;
-  }));
-  return results.filter(Boolean);
-}
-
-function preloadImage(source) {
-  return new Promise((resolve) => {
-    const image = new Image();
-    const timeout = window.setTimeout(() => resolve(false), 15000);
-    image.onload = () => { window.clearTimeout(timeout); resolve(true); };
-    image.onerror = () => { window.clearTimeout(timeout); resolve(false); };
-    image.src = source;
-  });
-}
-
-function startMarquees() {
+function startMarquees(galleries) {
   marqueeTimers.forEach((timer) => window.clearTimeout(timer));
   marqueeTimers = [];
 
-  document.querySelectorAll(".marquee-track").forEach((track) => {
-    const windowElement = track.closest(".marquee-window");
-    const cards = Array.from(track.querySelectorAll(".gallery-image"));
-    const originalCount = cards.length;
-    const firstCard = cards[0];
-    if (!windowElement || !firstCard || !originalCount) return;
-
+  galleries.forEach((gallery) => {
+    const section = document.querySelector(`#gallery-${slugify(gallery.title)}`);
+    const imageElement = section?.querySelector(".marquee-image");
+    const status = section?.querySelector(".marquee-status");
+    if (!imageElement || !status) return;
     let current = 0;
-    const moveToCenter = (animate) => {
-      const gap = Number.parseFloat(getComputedStyle(track).gap) || 0;
-      const cardWidth = firstCard.getBoundingClientRect().width;
-      const centerOffset = Math.max(0, (windowElement.clientWidth - cardWidth) / 2);
-      track.style.transition = animate ? "transform 700ms ease" : "none";
-      track.style.transform = `translateX(${centerOffset - (current * (cardWidth + gap))}px)`;
+
+    const showNext = () => {
+      if (!section.isConnected) return;
+      const image = gallery.images[current];
+      const loader = new Image();
+      loader.onload = () => {
+        imageElement.src = image.source;
+        imageElement.alt = image.name;
+        imageElement.classList.add("is-visible");
+        status.textContent = `${current + 1} of ${gallery.images.length}`;
+        current = (current + 1) % gallery.images.length;
+        marqueeTimers.push(window.setTimeout(showNext, 5000));
+      };
+      loader.onerror = () => {
+        current = (current + 1) % gallery.images.length;
+        marqueeTimers.push(window.setTimeout(showNext, 250));
+      };
+      loader.src = image.source;
     };
 
-    moveToCenter(false);
-    const advance = () => {
-      if (!track.isConnected) return;
-      current += 1;
-      if (current >= originalCount) {
-        const resetTimer = window.setTimeout(() => {
-          current = 0;
-          moveToCenter(false);
-        }, 700);
-        marqueeTimers.push(resetTimer);
-      } else {
-        moveToCenter(true);
-      }
-      marqueeTimers.push(window.setTimeout(advance, 5750));
-    };
-    marqueeTimers.push(window.setTimeout(advance, 5000));
-    window.addEventListener("resize", () => moveToCenter(false), { passive: true });
+    showNext();
   });
 }
 
