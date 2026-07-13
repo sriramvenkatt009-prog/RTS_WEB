@@ -32,10 +32,10 @@ async function renderGalleries() {
   const galleries = await getDriveGalleries() || await getLocalGalleries();
   galleryRoot.innerHTML = galleries.map(({ title, images }) => {
     if (!images.length) return `<section><div class="gallery-group-header"><h3>${title}</h3></div><p class="gallery-empty">Images will appear here soon.</p></section>`;
-    const imageButtons = images.map(({ source, name }) => {
+    const imageButtons = [...images, ...images].map(({ source, name }) => {
       return `<button class="gallery-image" type="button" data-source="${source}" data-caption="${name}" aria-label="Open ${name}"><img src="${source}" alt="${name}" loading="lazy"></button>`;
     }).join("");
-    return `<section><div class="gallery-group-header"><h3>${title}</h3><span>${images.length} images</span></div><div class="image-grid">${imageButtons}</div></section>`;
+    return `<section><div class="gallery-group-header"><h3>${title}</h3><span>${images.length} images</span></div><div class="marquee-window"><div class="marquee-track">${imageButtons}</div></div></section>`;
   }).join("");
 }
 
@@ -44,20 +44,56 @@ async function getDriveGalleries() {
   try {
     const response = await fetch(driveConfig.apiUrl, { cache: "no-store" });
     if (!response.ok) throw new Error("Google Drive gallery API is unavailable");
-    const data = await response.json();
-    if (!Array.isArray(data)) throw new Error("Invalid Google Drive gallery data");
-    const galleries = data.map((gallery) => ({
-      title: String(gallery.name || "Gallery"),
-      images: Array.isArray(gallery.images) ? gallery.images.map((source, index) => ({
-        source,
-        name: `${gallery.name || "Gallery"} image ${index + 1}`,
-      })) : [],
-    })).filter((gallery) => gallery.images.length);
-    return galleries.length ? galleries : null;
+    return normaliseDriveGalleries(await response.json());
   } catch (error) {
-    console.warn("Google Drive galleries could not load. Using local images instead.", error);
-    return null;
+    try {
+      return await loadDriveGalleriesWithJsonp();
+    } catch (jsonpError) {
+      console.warn("Google Drive galleries could not load. Using local images instead.", jsonpError);
+      return null;
+    }
   }
+}
+
+function normaliseDriveGalleries(data) {
+  if (!Array.isArray(data)) throw new Error("Invalid Google Drive gallery data");
+  const galleries = data.map((gallery) => ({
+    title: String(gallery.name || "Gallery"),
+    images: Array.isArray(gallery.images) ? gallery.images.map((source, index) => ({
+      source,
+      name: `${gallery.name || "Gallery"} image ${index + 1}`,
+    })) : [],
+  })).filter((gallery) => gallery.images.length);
+  return galleries.length ? galleries : null;
+}
+
+function loadDriveGalleriesWithJsonp() {
+  return new Promise((resolve, reject) => {
+    const callback = `driveGallery_${Date.now()}`;
+    const script = document.createElement("script");
+    const timeout = window.setTimeout(() => cleanup(new Error("Google Drive request timed out")), 12000);
+
+    function cleanup(error) {
+      window.clearTimeout(timeout);
+      delete window[callback];
+      script.remove();
+      if (error) reject(error);
+    }
+
+    window[callback] = (data) => {
+      try {
+        const galleries = normaliseDriveGalleries(data);
+        cleanup();
+        resolve(galleries);
+      } catch (error) {
+        cleanup(error);
+      }
+    };
+
+    script.onerror = () => cleanup(new Error("Google Drive JSONP request failed"));
+    script.src = `${driveConfig.apiUrl}${driveConfig.apiUrl.includes("?") ? "&" : "?"}callback=${callback}`;
+    document.head.append(script);
+  });
 }
 
 async function getLocalGalleries() {
