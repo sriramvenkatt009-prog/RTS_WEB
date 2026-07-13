@@ -42,3 +42,9 @@ dialog { width:min(900px,92vw); padding:0; border:0; border-radius:16px; overflo
 @media (max-width:900px) { .site-navigation { overflow-x:auto; max-width:70vw; }.site-navigation a { white-space:nowrap; } }
 @media (max-width:760px) { .hero-visual { min-height:300px; }.hero-invitation { width:44%; }.gallery-image { flex-basis:210px; width:210px; }.marquee-track { animation-duration:95s; } }
 @media (prefers-reduced-motion:reduce) { .marquee-window { overflow-x:auto; }.marquee-track { animation:none; } }
+
+/* Larger frames with contain preserve the complete photo, including portrait images. */
+.gallery-image { flex:0 0 clamp(340px,38vw,520px); width:clamp(340px,38vw,520px); height:clamp(280px,32vw,420px); aspect-ratio:auto; background:#f1f4f5; }
+.gallery-image img { object-fit:contain; transform:none; }
+.gallery-image:hover img { transform:none; }
+@media (max-width:760px) { .gallery-image { flex-basis:285px; width:285px; height:300px; } }
