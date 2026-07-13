@@ -13,6 +13,7 @@ const driveMenuLinks = document.querySelector("#drive-menu-links");
 const dialog = document.querySelector("#image-dialog");
 const dialogImage = dialog.querySelector("img");
 const dialogCaption = dialog.querySelector("p");
+let marqueeTimers = [];
 
 async function getLocalImages(gallery) {
   try {
@@ -36,10 +37,53 @@ async function renderGalleries() {
     const id = `gallery-${slugify(title)}`;
     if (!images.length) return `<section><div class="gallery-group-header"><h3>${title}</h3></div><p class="gallery-empty">Images will appear here soon.</p></section>`;
     const imageButtons = [...images, ...images].map(({ source, name }) => {
-      return `<button class="gallery-image" type="button" data-source="${source}" data-caption="${name}" aria-label="Open ${name}"><img src="${source}" alt="${name}" loading="lazy"></button>`;
+      return `<button class="gallery-image" type="button" data-source="${source}" data-caption="${name}" aria-label="Open ${name}"><img src="${source}" alt="${name}" loading="eager"></button>`;
     }).join("");
     return `<section id="${id}" class="drive-gallery"><div class="gallery-group-header"><h3>${title}</h3><span>${images.length} images</span></div><div class="marquee-window"><div class="marquee-track">${imageButtons}</div></div></section>`;
   }).join("");
+  startMarquees();
+}
+
+function startMarquees() {
+  marqueeTimers.forEach((timer) => window.clearTimeout(timer));
+  marqueeTimers = [];
+
+  document.querySelectorAll(".marquee-track").forEach((track) => {
+    const windowElement = track.closest(".marquee-window");
+    const cards = Array.from(track.querySelectorAll(".gallery-image"));
+    const originalCount = cards.length / 2;
+    const firstCard = cards[0];
+    if (!windowElement || !firstCard || !originalCount) return;
+
+    track.querySelectorAll("img").forEach((image) => {
+      image.addEventListener("error", () => image.closest(".gallery-image")?.remove(), { once: true });
+    });
+
+    let current = 0;
+    const moveToCenter = (animate) => {
+      const gap = Number.parseFloat(getComputedStyle(track).gap) || 0;
+      const cardWidth = firstCard.getBoundingClientRect().width;
+      const centerOffset = Math.max(0, (windowElement.clientWidth - cardWidth) / 2);
+      track.style.transition = animate ? "transform 700ms ease" : "none";
+      track.style.transform = `translateX(${centerOffset - (current * (cardWidth + gap))}px)`;
+    };
+
+    moveToCenter(false);
+    const advance = () => {
+      current += 1;
+      moveToCenter(true);
+      if (current === originalCount) {
+        const resetTimer = window.setTimeout(() => {
+          current = 0;
+          moveToCenter(false);
+        }, 750);
+        marqueeTimers.push(resetTimer);
+      }
+      marqueeTimers.push(window.setTimeout(advance, 5750));
+    };
+    marqueeTimers.push(window.setTimeout(advance, 5000));
+    window.addEventListener("resize", () => moveToCenter(false), { passive: true });
+  });
 }
 
 function slugify(value) {
