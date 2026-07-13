@@ -37,7 +37,7 @@ async function renderGalleries() {
   galleryRoot.innerHTML = galleries.map(({ title, images }) => {
     const id = `gallery-${slugify(title)}`;
     if (!images.length) return `<section><div class="gallery-group-header"><h3>${title}</h3></div><p class="gallery-empty">Images will appear here soon.</p></section>`;
-    return `<section id="${id}" class="drive-gallery"><div class="gallery-group-header"><h3>${title}</h3><span>${images.length} images</span></div><div class="marquee-window"><img class="marquee-image" alt="${title}"><p class="marquee-status">Loading images…</p></div></section>`;
+    return `<section id="${id}" class="drive-gallery"><div class="gallery-group-header"><h3>${title}</h3><span>${images.length} images</span></div><div class="marquee-window"><div class="marquee-image-grid"><img class="marquee-image" alt="${title}"><img class="marquee-image" alt="${title}"><img class="marquee-image" alt="${title}"></div><p class="marquee-status">Loading images…</p></div></section>`;
   }).join("");
   startMarquees(galleries);
 }
@@ -48,31 +48,44 @@ function startMarquees(galleries) {
 
   galleries.forEach((gallery) => {
     const section = document.querySelector(`#gallery-${slugify(gallery.title)}`);
-    const imageElement = section?.querySelector(".marquee-image");
+    const imageElements = Array.from(section?.querySelectorAll(".marquee-image") || []);
     const status = section?.querySelector(".marquee-status");
-    if (!imageElement || !status) return;
+    if (!imageElements.length || !status) return;
     let current = 0;
 
-    const showNext = () => {
+    const showNextBatch = () => {
       if (!section.isConnected) return;
-      const image = gallery.images[current];
-      const loader = new Image();
-      loader.onload = () => {
-        imageElement.src = image.source;
-        imageElement.alt = image.name;
-        imageElement.classList.add("is-visible");
-        status.textContent = `${current + 1} of ${gallery.images.length}`;
-        current = (current + 1) % gallery.images.length;
-        marqueeTimers.push(window.setTimeout(showNext, 5000));
-      };
-      loader.onerror = () => {
-        current = (current + 1) % gallery.images.length;
-        marqueeTimers.push(window.setTimeout(showNext, 250));
-      };
-      loader.src = image.source;
+      const batch = imageElements.map((_, offset) => gallery.images[(current + offset) % gallery.images.length]);
+      Promise.all(batch.map((image) => loadDriveImage(image))).then((loaded) => {
+        if (!section.isConnected) return;
+        loaded.forEach((image, index) => {
+          const element = imageElements[index];
+          if (image) {
+            element.src = image.source;
+            element.alt = image.name;
+            element.classList.add("is-visible");
+          } else {
+            element.removeAttribute("src");
+            element.classList.remove("is-visible");
+          }
+        });
+        const last = Math.min(current + imageElements.length, gallery.images.length);
+        status.textContent = `Images ${current + 1}–${last} of ${gallery.images.length}`;
+        current = (current + imageElements.length) % gallery.images.length;
+        marqueeTimers.push(window.setTimeout(showNextBatch, 5000));
+      });
     };
 
-    showNext();
+    showNextBatch();
+  });
+}
+
+function loadDriveImage(image) {
+  return new Promise((resolve) => {
+    const loader = new Image();
+    loader.onload = () => resolve(image);
+    loader.onerror = () => resolve(null);
+    loader.src = image.source;
   });
 }
 
