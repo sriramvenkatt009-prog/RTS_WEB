@@ -1,4 +1,8 @@
-const galleries = [
+const driveConfig = {
+  apiUrl: "https://script.google.com/macros/s/AKfycbzNbxjI3TjrFb-dgMDGASMRDEzTmUhmzpR4dXausDD2ZtLh9nJ2-_DTqbhiAZWamjKN9g/exec",
+};
+
+const localGalleries = [
   { title: "Collaborations", folder: "collaborations" },
   { title: "Projects", folder: "projects" },
   { title: "Candidates", folder: "candidates" },
@@ -9,7 +13,7 @@ const dialog = document.querySelector("#image-dialog");
 const dialogImage = dialog.querySelector("img");
 const dialogCaption = dialog.querySelector("p");
 
-async function getImages(gallery) {
+async function getLocalImages(gallery) {
   try {
     const response = await fetch(`${gallery.folder}/manifest.json`, { cache: "no-store" });
     if (!response.ok) throw new Error("Manifest unavailable");
@@ -25,16 +29,46 @@ function readableName(file) {
 }
 
 async function renderGalleries() {
-  const loaded = await Promise.all(galleries.map(async (gallery) => ({ ...gallery, files: await getImages(gallery) })));
-  galleryRoot.innerHTML = loaded.map(({ title, folder, files }) => {
-    if (!files.length) return `<section><div class="gallery-group-header"><h3>${title}</h3></div><p class="gallery-empty">Images will appear here soon.</p></section>`;
-    const images = files.map((file) => {
-      const source = `${folder}/${encodeURIComponent(file)}`;
-      const name = readableName(file);
+  const galleries = await getDriveGalleries() || await getLocalGalleries();
+  galleryRoot.innerHTML = galleries.map(({ title, images }) => {
+    if (!images.length) return `<section><div class="gallery-group-header"><h3>${title}</h3></div><p class="gallery-empty">Images will appear here soon.</p></section>`;
+    const imageButtons = images.map(({ source, name }) => {
       return `<button class="gallery-image" type="button" data-source="${source}" data-caption="${name}" aria-label="Open ${name}"><img src="${source}" alt="${name}" loading="lazy"></button>`;
     }).join("");
-    return `<section><div class="gallery-group-header"><h3>${title}</h3><span>${files.length} images</span></div><div class="image-grid">${images}</div></section>`;
+    return `<section><div class="gallery-group-header"><h3>${title}</h3><span>${images.length} images</span></div><div class="image-grid">${imageButtons}</div></section>`;
   }).join("");
+}
+
+async function getDriveGalleries() {
+  if (!driveConfig.apiUrl) return null;
+  try {
+    const response = await fetch(driveConfig.apiUrl, { cache: "no-store" });
+    if (!response.ok) throw new Error("Google Drive gallery API is unavailable");
+    const data = await response.json();
+    if (!Array.isArray(data)) throw new Error("Invalid Google Drive gallery data");
+    const galleries = data.map((gallery) => ({
+      title: String(gallery.name || "Gallery"),
+      images: Array.isArray(gallery.images) ? gallery.images.map((source, index) => ({
+        source,
+        name: `${gallery.name || "Gallery"} image ${index + 1}`,
+      })) : [],
+    })).filter((gallery) => gallery.images.length);
+    return galleries.length ? galleries : null;
+  } catch (error) {
+    console.warn("Google Drive galleries could not load. Using local images instead.", error);
+    return null;
+  }
+}
+
+async function getLocalGalleries() {
+  const loaded = await Promise.all(localGalleries.map(async (gallery) => ({ ...gallery, files: await getLocalImages(gallery) })));
+  return loaded.map(({ title, folder, files }) => ({
+    title,
+    images: files.map((file) => ({
+      source: `${folder}/${encodeURIComponent(file)}`,
+      name: readableName(file),
+    })),
+  })).filter((gallery) => gallery.images.length);
 }
 
 document.querySelector(".menu-toggle").addEventListener("click", (event) => {
@@ -61,3 +95,4 @@ dialog.querySelector(".dialog-close").addEventListener("click", () => dialog.clo
 dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
 document.querySelector("#year").textContent = new Date().getFullYear();
 renderGalleries();
+window.setInterval(renderGalleries, 2 * 60 * 1000);
