@@ -14,6 +14,7 @@ const dialog = document.querySelector("#image-dialog");
 const dialogImage = dialog.querySelector("img");
 const dialogCaption = dialog.querySelector("p");
 let marqueeTimers = [];
+let wakeLock = null;
 
 async function getLocalImages(gallery) {
   try {
@@ -190,3 +191,24 @@ dialog.addEventListener("click", (event) => { if (event.target === dialog) dialo
 document.querySelector("#year").textContent = new Date().getFullYear();
 renderGalleries();
 window.setInterval(renderGalleries, 2 * 60 * 1000);
+
+async function keepPresentationAwake() {
+  if (!("wakeLock" in navigator) || document.visibilityState !== "visible") return;
+  try {
+    wakeLock = await navigator.wakeLock.request("screen");
+    wakeLock.addEventListener("release", () => { wakeLock = null; });
+  } catch (error) {
+    console.info("Screen wake lock requires a supported browser and may need one click to activate.", error);
+  }
+}
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") {
+    keepPresentationAwake();
+    renderGalleries();
+  }
+});
+
+// Browsers that require a user gesture will enable presentation mode on the first click or tap.
+window.addEventListener("pointerdown", keepPresentationAwake, { once: true, passive: true });
+keepPresentationAwake();
