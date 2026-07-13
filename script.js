@@ -9,6 +9,7 @@ const localGalleries = [
 ];
 
 const galleryRoot = document.querySelector("#gallery-sections");
+const driveMenuLinks = document.querySelector("#drive-menu-links");
 const dialog = document.querySelector("#image-dialog");
 const dialogImage = dialog.querySelector("img");
 const dialogCaption = dialog.querySelector("p");
@@ -30,12 +31,25 @@ function readableName(file) {
 
 async function renderGalleries() {
   const galleries = await getDriveGalleries() || await getLocalGalleries();
+  renderDriveMenu(galleries);
   galleryRoot.innerHTML = galleries.map(({ title, images }) => {
+    const id = `gallery-${slugify(title)}`;
     if (!images.length) return `<section><div class="gallery-group-header"><h3>${title}</h3></div><p class="gallery-empty">Images will appear here soon.</p></section>`;
     const imageButtons = [...images, ...images].map(({ source, name }) => {
       return `<button class="gallery-image" type="button" data-source="${source}" data-caption="${name}" aria-label="Open ${name}"><img src="${source}" alt="${name}" loading="lazy"></button>`;
     }).join("");
-    return `<section><div class="gallery-group-header"><h3>${title}</h3><span>${images.length} images</span></div><div class="marquee-window"><div class="marquee-track">${imageButtons}</div></div></section>`;
+    return `<section id="${id}" class="drive-gallery"><div class="gallery-group-header"><h3>${title}</h3><span>${images.length} images</span></div><div class="marquee-window"><div class="marquee-track">${imageButtons}</div></div></section>`;
+  }).join("");
+}
+
+function slugify(value) {
+  return String(value).toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+function renderDriveMenu(galleries) {
+  driveMenuLinks.innerHTML = galleries.map(({ title }) => {
+    const id = `gallery-${slugify(title)}`;
+    return `<a href="#${id}">${title}</a>`;
   }).join("");
 }
 
