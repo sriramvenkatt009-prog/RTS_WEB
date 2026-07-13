@@ -58,21 +58,23 @@ function startMarquees(galleries) {
       const batch = imageElements.map((_, offset) => gallery.images[(current + offset) % gallery.images.length]);
       Promise.all(batch.map((image) => loadDriveImage(image))).then((loaded) => {
         if (!section.isConnected) return;
-        loaded.forEach((image, index) => {
-          const element = imageElements[index];
-          if (image) {
-            element.src = image.source;
-            element.alt = image.name;
-            element.classList.add("is-visible");
-          } else {
-            element.removeAttribute("src");
-            element.classList.remove("is-visible");
-          }
-        });
-        const last = Math.min(current + imageElements.length, gallery.images.length);
-        status.textContent = `Images ${current + 1}–${last} of ${gallery.images.length}`;
-        current = (current + imageElements.length) % gallery.images.length;
-        marqueeTimers.push(window.setTimeout(showNextBatch, 5000));
+        imageElements.forEach((element) => element.classList.remove("is-visible"));
+        marqueeTimers.push(window.setTimeout(() => {
+          loaded.forEach((image, index) => {
+            const element = imageElements[index];
+            if (image) {
+              element.src = image.source;
+              element.alt = image.name;
+              element.classList.add("is-visible");
+            } else {
+              element.removeAttribute("src");
+            }
+          });
+          const last = Math.min(current + imageElements.length, gallery.images.length);
+          status.textContent = `Images ${current + 1}–${last} of ${gallery.images.length}`;
+          current = (current + imageElements.length) % gallery.images.length;
+          marqueeTimers.push(window.setTimeout(showNextBatch, 5000));
+        }, 300));
       });
     };
 
