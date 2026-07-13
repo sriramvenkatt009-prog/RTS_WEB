@@ -48,9 +48,10 @@ function startMarquees(galleries) {
 
   galleries.forEach((gallery) => {
     const section = document.querySelector(`#gallery-${slugify(gallery.title)}`);
+    const windowElement = section?.querySelector(".marquee-window");
     const imageElements = Array.from(section?.querySelectorAll(".marquee-image") || []);
     const status = section?.querySelector(".marquee-status");
-    if (!imageElements.length || !status) return;
+    if (!windowElement || !imageElements.length || !status) return;
     let current = 0;
 
     const showNextBatch = () => {
@@ -75,10 +76,12 @@ function startMarquees(galleries) {
             }
           });
           window.requestAnimationFrame(() => {
+            windowElement.classList.add("is-transitioning");
             imageElements.forEach((element) => {
               element.classList.remove("is-arriving");
               element.classList.add("is-visible");
             });
+            marqueeTimers.push(window.setTimeout(() => windowElement.classList.remove("is-transitioning"), 850));
           });
           const last = Math.min(current + imageElements.length, gallery.images.length);
           status.textContent = `Images ${current + 1}–${last} of ${gallery.images.length}`;

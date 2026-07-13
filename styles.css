@@ -52,4 +52,10 @@ dialog { width:min(900px,92vw); padding:0; border:0; border-radius:16px; overflo
 .marquee-image { display:block; width:100%; height:min(500px,calc(100vw * .30)); min-height:320px; object-fit:contain; border:7px solid #fff; border-radius:12px; background:#f1f4f5; box-shadow:0 9px 20px rgba(23,32,42,.15); opacity:0; transform:translateY(18px) scale(.97); transition:opacity .45s ease,transform .45s ease; }
 .marquee-image.is-visible { opacity:1; transform:translateY(0) scale(1); }.marquee-image:nth-child(2) { transition-delay:.1s; }.marquee-image:nth-child(3) { transition-delay:.2s; }.marquee-status { margin:12px 0 0; color:#7a5900; font-size:.85rem; font-weight:800; }
 .marquee-image.is-leaving { opacity:0; transform:translateX(-115%) scale(.96); }.marquee-image.is-arriving { opacity:0; transform:translateX(115%) scale(.96); }
+
+/* Futuristic holographic sweep during each train-style batch change. */
+.marquee-window { position:relative; isolation:isolate; perspective:1200px; }.marquee-image-grid { transform-style:preserve-3d; }
+.marquee-window::after { content:""; position:absolute; z-index:3; inset:-18% -30%; pointer-events:none; opacity:0; background:linear-gradient(105deg,transparent 38%,rgba(110,237,255,.08) 43%,rgba(226,169,255,.8) 50%,rgba(110,237,255,.08) 57%,transparent 62%); transform:translateX(-120%) skewX(-14deg); mix-blend-mode:screen; }
+.marquee-window.is-transitioning::after { animation:holo-sweep .85s ease-out; }.marquee-window.is-transitioning .marquee-image { border-color:#c9f5ff; box-shadow:0 0 10px rgba(93,220,255,.95),0 0 32px rgba(143,96,255,.42),0 12px 28px rgba(23,32,42,.2); filter:saturate(1.13) contrast(1.05); }
+@keyframes holo-sweep { 0% { opacity:0; transform:translateX(-120%) skewX(-14deg); } 18% { opacity:1; } 100% { opacity:0; transform:translateX(120%) skewX(-14deg); } }
 @media (max-width:760px) { .marquee-window { min-height:350px; }.marquee-image-grid { grid-template-columns:1fr; }.marquee-image { width:96%; height:300px; min-height:0; } }
