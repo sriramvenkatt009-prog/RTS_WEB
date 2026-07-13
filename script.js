@@ -1,268 +1,63 @@
-const driveConfig = {
-  // Paste your deployed Google Apps Script web app URL here.
-  apiUrl: "",
-};
-
-const localGalleryFolders = [
-  { name: "Collaborations", folder: "collaborations", eyebrow: "Industry network" },
-  { name: "Projects", folder: "projects", eyebrow: "Practical learning" },
-  { name: "Candidates", folder: "candidates", eyebrow: "Placed talent" },
+const galleries = [
+  { title: "Collaborations", folder: "collaborations" },
+  { title: "Projects", folder: "projects" },
+  { title: "Candidates", folder: "candidates" },
 ];
 
-const imageExtensions = new Set(["jpg", "jpeg", "png", "gif", "webp", "svg", "avif"]);
-const dynamicMenu = document.querySelector("#dynamic-menu-links");
-const galleryRoot = document.querySelector("#dynamic-gallery-sections");
-const heroMessages = Array.from(document.querySelectorAll(".hero-slide"));
-const infoSlides = Array.from(document.querySelectorAll(".info-slide"));
-const infoDotsRoot = document.querySelector(".info-dots");
-const sliders = new Map();
-let activeHeroMessage = 0;
-let activeInfoSlide = 0;
+const galleryRoot = document.querySelector("#gallery-sections");
+const dialog = document.querySelector("#image-dialog");
+const dialogImage = dialog.querySelector("img");
+const dialogCaption = dialog.querySelector("p");
 
-function slugify(value) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/&/g, "and")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-async function loadImagesFromManifest(folder) {
-  const response = await fetch(`${folder}/manifest.json`);
-
-  if (!response.ok) {
-    return [];
-  }
-
-  const files = await response.json();
-  return files
-    .filter((file) => imageExtensions.has((file.split(".").pop() || "").toLowerCase()))
-    .map((file) => `${folder}/${file}`);
-}
-
-async function loadLocalGalleries() {
-  const galleries = await Promise.all(
-    localGalleryFolders.map(async (item) => ({
-      ...item,
-      id: slugify(item.name),
-      images: await loadImagesFromManifest(item.folder),
-    }))
-  );
-
-  return galleries.filter((gallery) => gallery.images.length);
-}
-
-async function loadDriveGalleries() {
-  if (!driveConfig.apiUrl) {
-    return [];
-  }
-
-  const response = await fetch(driveConfig.apiUrl, { cache: "no-store" });
-
-  if (!response.ok) {
-    throw new Error("Google Drive gallery API failed");
-  }
-
-  const galleries = await response.json();
-  return galleries
-    .map((gallery) => ({
-      id: slugify(gallery.name || "gallery"),
-      name: gallery.name || "Gallery",
-      folder: gallery.folderId || gallery.name || "drive",
-      eyebrow: gallery.description || "Google Drive gallery",
-      images: Array.isArray(gallery.images) ? gallery.images : [],
-    }))
-    .filter((gallery) => gallery.images.length);
-}
-
-function renderMenu(galleries) {
-  dynamicMenu.innerHTML = galleries
-    .map((gallery) => `<a href="#${gallery.id}">${gallery.name}</a>`)
-    .join("");
-}
-
-function renderGallerySections(galleries) {
-  galleryRoot.innerHTML = galleries
-    .map(
-      (gallery, index) => `
-        <section id="${gallery.id}" class="gallery-section page-section gallery-tone-${index % 3}" aria-labelledby="${gallery.id}-title">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">${gallery.eyebrow}</p>
-              <h2 id="${gallery.id}-title">${gallery.name}</h2>
-            </div>
-            <span class="image-count">${gallery.images.length} images</span>
-          </div>
-
-          <div class="marquee-shell" aria-live="polite">
-            <div class="image-marquee" data-gallery-id="${gallery.id}">
-              <p class="loading">Loading ${gallery.name} images...</p>
-            </div>
-          </div>
-        </section>
-      `
-    )
-    .join("");
-
-  galleries.forEach((gallery) => {
-    const marquee = galleryRoot.querySelector(`[data-gallery-id="${gallery.id}"]`);
-    renderImages(marquee, gallery.images, gallery.name);
-  });
-}
-
-function slideWidth(marquee) {
-  const firstItem = marquee.querySelector(".marquee-item");
-  const styles = window.getComputedStyle(marquee);
-  const gap = Number.parseFloat(styles.columnGap || styles.gap || "0");
-  return firstItem ? firstItem.getBoundingClientRect().width + gap : 0;
-}
-
-function moveGallery(marquee, totalImages) {
-  const state = sliders.get(marquee);
-
-  if (!state) {
-    return;
-  }
-
-  state.currentSlide += 1;
-  marquee.style.transition = "transform 1200ms ease";
-  marquee.style.transform = `translateX(-${state.currentSlide * slideWidth(marquee)}px)`;
-
-  if (state.currentSlide === totalImages) {
-    window.setTimeout(() => {
-      state.currentSlide = 0;
-      marquee.style.transition = "none";
-      marquee.style.transform = "translateX(0)";
-      marquee.offsetHeight;
-      marquee.style.transition = "transform 1200ms ease";
-    }, 1250);
-  }
-}
-
-function startGallerySlider(marquee, totalImages) {
-  const state = sliders.get(marquee);
-
-  const tick = () => {
-    moveGallery(marquee, totalImages);
-    state.timer = window.setTimeout(tick, 4200);
-  };
-
-  state.timer = window.setTimeout(tick, 3000);
-}
-
-function renderImages(marquee, images, galleryName) {
-  if (!images.length) {
-    marquee.innerHTML = `<p class="loading">No images found for ${galleryName}.</p>`;
-    return;
-  }
-
-  const existingState = sliders.get(marquee);
-
-  if (existingState?.timer) {
-    clearTimeout(existingState.timer);
-  }
-
-  sliders.set(marquee, { currentSlide: 0, timer: null });
-
-  const displayImages = images.length >= 3 ? images : Array.from({ length: 3 }, (_, index) => images[index % images.length]);
-  const carouselImages = [...displayImages, ...displayImages.slice(0, 3)];
-
-  marquee.innerHTML = carouselImages
-    .map((src, index) => {
-      const cleanName = decodeURIComponent(src.split("/").pop() || `${galleryName} image ${index + 1}`);
-      return `
-        <figure class="marquee-item">
-          <img src="${src}" alt="${cleanName}" loading="lazy">
-        </figure>
-      `;
-    })
-    .join("");
-
-  marquee.style.transform = "translateX(0)";
-  startGallerySlider(marquee, displayImages.length);
-}
-
-function scrollToActiveSection() {
-  const pageSections = Array.from(document.querySelectorAll(".page-section"));
-  const sectionIds = new Set(pageSections.map((section) => section.id));
-  const selectedId = window.location.hash.replace("#", "") || "home";
-  const activeId = sectionIds.has(selectedId) ? selectedId : "home";
-
-  window.requestAnimationFrame(() => {
-    document.getElementById(activeId)?.scrollIntoView({ behavior: "smooth", block: "start" });
-  });
-}
-
-function showHeroMessage(index) {
-  activeHeroMessage = index % heroMessages.length;
-
-  heroMessages.forEach((message, messageIndex) => {
-    message.classList.toggle("is-active", messageIndex === activeHeroMessage);
-  });
-}
-
-function initHeroMessages() {
-  if (heroMessages.length < 2) {
-    return;
-  }
-
-  showHeroMessage(0);
-
-  window.setInterval(() => {
-    showHeroMessage(activeHeroMessage + 1);
-  }, 6000);
-}
-
-function showInfoSlide(index) {
-  activeInfoSlide = index % infoSlides.length;
-
-  infoSlides.forEach((slide, slideIndex) => {
-    slide.classList.toggle("is-active", slideIndex === activeInfoSlide);
-  });
-
-  document.querySelectorAll(".info-dot").forEach((dot, dotIndex) => {
-    dot.classList.toggle("is-active", dotIndex === activeInfoSlide);
-  });
-}
-
-function initInfoSlider() {
-  if (!infoSlides.length || !infoDotsRoot) {
-    return;
-  }
-
-  infoDotsRoot.innerHTML = infoSlides.map(() => '<span class="info-dot"></span>').join("");
-  showInfoSlide(0);
-
-  window.setInterval(() => {
-    showInfoSlide(activeInfoSlide + 1);
-  }, 6000);
-}
-
-async function initGalleries() {
-  galleryRoot.innerHTML = '<p class="loading gallery-loading">Loading galleries...</p>';
-
+async function getImages(gallery) {
   try {
-    const driveGalleries = await loadDriveGalleries();
-    const galleries = driveGalleries.length ? driveGalleries : await loadLocalGalleries();
-
-    if (!galleries.length) {
-      galleryRoot.innerHTML = '<p class="loading gallery-loading">No galleries found yet.</p>';
-      return;
-    }
-
-    renderMenu(galleries);
-    renderGallerySections(galleries);
-    scrollToActiveSection();
-  } catch (error) {
-    const galleries = await loadLocalGalleries();
-    renderMenu(galleries);
-    renderGallerySections(galleries);
-    scrollToActiveSection();
+    const response = await fetch(`${gallery.folder}/manifest.json`, { cache: "no-store" });
+    if (!response.ok) throw new Error("Manifest unavailable");
+    const files = await response.json();
+    return files.filter((file) => /\.(jpe?g|png|gif|webp|svg|avif)$/i.test(file));
+  } catch {
+    return [];
   }
 }
 
-window.addEventListener("hashchange", scrollToActiveSection);
-initHeroMessages();
-initInfoSlider();
-initGalleries();
+function readableName(file) {
+  return decodeURIComponent(file).replace(/[-_]/g, " ").replace(/\.[^.]+$/, "");
+}
+
+async function renderGalleries() {
+  const loaded = await Promise.all(galleries.map(async (gallery) => ({ ...gallery, files: await getImages(gallery) })));
+  galleryRoot.innerHTML = loaded.map(({ title, folder, files }) => {
+    if (!files.length) return `<section><div class="gallery-group-header"><h3>${title}</h3></div><p class="gallery-empty">Images will appear here soon.</p></section>`;
+    const images = files.map((file) => {
+      const source = `${folder}/${encodeURIComponent(file)}`;
+      const name = readableName(file);
+      return `<button class="gallery-image" type="button" data-source="${source}" data-caption="${name}" aria-label="Open ${name}"><img src="${source}" alt="${name}" loading="lazy"></button>`;
+    }).join("");
+    return `<section><div class="gallery-group-header"><h3>${title}</h3><span>${files.length} images</span></div><div class="image-grid">${images}</div></section>`;
+  }).join("");
+}
+
+document.querySelector(".menu-toggle").addEventListener("click", (event) => {
+  const nav = document.querySelector(".site-navigation");
+  const open = nav.classList.toggle("is-open");
+  event.currentTarget.setAttribute("aria-expanded", String(open));
+});
+
+document.querySelector(".site-navigation").addEventListener("click", () => {
+  document.querySelector(".site-navigation").classList.remove("is-open");
+  document.querySelector(".menu-toggle").setAttribute("aria-expanded", "false");
+});
+
+galleryRoot.addEventListener("click", (event) => {
+  const button = event.target.closest(".gallery-image");
+  if (!button) return;
+  dialogImage.src = button.dataset.source;
+  dialogImage.alt = button.dataset.caption;
+  dialogCaption.textContent = button.dataset.caption;
+  dialog.showModal();
+});
+
+dialog.querySelector(".dialog-close").addEventListener("click", () => dialog.close());
+dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
+document.querySelector("#year").textContent = new Date().getFullYear();
+renderGalleries();

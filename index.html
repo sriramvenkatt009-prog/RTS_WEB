@@ -4,128 +4,76 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Robotic Tech System</title>
-  <link rel="stylesheet" href="styles.css?v=20260713-restore">
+  <meta name="description" content="Robotic Tech System provides practical training, projects, and placement support.">
+  <title>Robotic Tech System | Training & Placement Support</title>
+  <link rel="stylesheet" href="styles.css?v=20260713-redesign">
 </head>
 
 <body>
   <header class="site-header">
     <a class="brand" href="#home" aria-label="Robotic Tech System home">
-      <span class="brand-mark"></span>
-      <span>Robotic Tech System</span>
+      <span class="brand-mark" aria-hidden="true">RT</span>
+      <span>Robotic Tech <b>System</b></span>
     </a>
-    <nav class="top-menu" aria-label="Main menu">
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-navigation">Menu</button>
+    <nav id="site-navigation" class="site-navigation" aria-label="Main navigation">
       <a href="#home">Home</a>
-      <span id="dynamic-menu-links" class="dynamic-menu-links"></span>
-      <a href="#contact">Contact</a>
+      <a href="#about">About</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#contact" class="nav-cta">Contact us</a>
     </nav>
   </header>
 
   <main>
-    <section id="home" class="hero page-section" aria-labelledby="hero-title">
-      <h1 id="hero-title" class="visually-hidden">Robotic Tech System</h1>
-      <div class="hero-slide hero-slide-text is-active"></div>
-      <div class="hero-slide hero-slide-companies" aria-label="Robotic Tech System connected with MNC companies">
-        <div class="company-network">
-          <div class="network-hub">
-            <span class="network-kicker">Placement network</span>
-            <strong>Robotic Tech System</strong>
-          </div>
-
-          <div class="company-node node-tcs">TCS</div>
-          <div class="company-node node-wipro">Wipro</div>
-          <div class="company-node node-infosys">Infosys</div>
-          <div class="company-node node-capgemini">Capgemini</div>
-          <div class="company-node node-coforge">Coforge</div>
-          <div class="company-node node-techm">Tech Mahindra</div>
-          <div class="company-node node-cognizant">Cognizant</div>
+    <section id="home" class="hero">
+      <div class="hero-content">
+        <p class="eyebrow">Learn. Build. Get placed.</p>
+        <h1>Build the skills that move your career forward.</h1>
+        <p class="hero-text">Robotic Tech System helps students and professionals become job-ready through practical training, guided projects, and placement support.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#contact">Start your journey</a>
+          <a class="button button-secondary" href="#gallery">View our work <span aria-hidden="true">↓</span></a>
         </div>
+        <dl class="hero-stats" aria-label="Institute highlights">
+          <div><dt>1500+</dt><dd>Candidates guided</dd></div>
+          <div><dt>3</dt><dd>Learning tracks</dd></div>
+          <div><dt>1:1</dt><dd>Career support</dd></div>
+        </dl>
       </div>
-      <div class="hero-slide hero-slide-invitation" aria-label="Robotic Tech System anniversary celebration invitation">
-        <img src="invitation.jpeg" alt="Robotic Tech System anniversary celebrations invitation on 15th July 2026">
+      <div class="hero-visual" aria-hidden="true">
+        <div class="orb orb-one"></div><div class="orb orb-two"></div>
+        <div class="visual-card visual-card-main"><span>Career-ready</span><strong>Practical<br>learning</strong><i>↗</i></div>
+        <div class="visual-card visual-card-small"><span>Projects</span><strong>Real work.<br>Real confidence.</strong></div>
+        <div class="visual-line"></div>
       </div>
     </section>
 
-    <section class="home-info-section" aria-labelledby="home-info-title">
-      <div class="home-info-header">
-        <p class="eyebrow">Institute highlights</p>
-        <h2 id="home-info-title">Building careers with trusted industry connections</h2>
+    <section id="about" class="about section-shell">
+      <div class="section-intro"><p class="eyebrow">What we do</p><h2>More than training. A clear path to your next role.</h2></div>
+      <div class="feature-grid">
+        <article class="feature-card"><span class="feature-number">01</span><h3>Industry-focused training</h3><p>Learn the skills employers expect, with a focused and supportive learning path.</p></article>
+        <article class="feature-card"><span class="feature-number">02</span><h3>Project-based learning</h3><p>Build practical work you can confidently explain in technical interviews.</p></article>
+        <article class="feature-card"><span class="feature-number">03</span><h3>Placement guidance</h3><p>Prepare for applications, interviews, and your transition into a better role.</p></article>
       </div>
-
-      <div class="info-slider" aria-live="polite">
-        <article class="info-slide is-active">
-          <span class="slide-number">01</span>
-          <h3>Collaborated With Growing Companies</h3>
-          <p>
-            Robotic Tech System works with a strong network of companies to connect
-            skilled candidates with real career opportunities.
-          </p>
-        </article>
-
-        <article class="info-slide">
-          <span class="slide-number">02</span>
-          <h3>1500+ Candidates Placed</h3>
-          <p>
-            Freshers and experienced candidates have moved into better roles with
-            dedicated training, interview support, and placement guidance.
-          </p>
-        </article>
-
-        <article class="info-slide">
-          <span class="slide-number">03</span>
-          <h3>Project Based Training</h3>
-          <p>
-            Candidates learn through practical projects so they can explain their
-            skills confidently during technical interviews.
-          </p>
-        </article>
-
-        <article class="info-slide">
-          <span class="slide-number">04</span>
-          <h3>Support For Freshers And Experienced Talent</h3>
-          <p>
-            Training paths are shaped for different career stages, from first job
-            preparation to skill upgrades for working professionals.
-          </p>
-        </article>
-      </div>
-
-      <div class="info-dots" aria-hidden="true"></div>
     </section>
 
-    <div id="dynamic-gallery-sections" class="dynamic-gallery-sections"></div>
+    <section id="gallery" class="gallery section-shell">
+      <div class="section-heading"><div><p class="eyebrow">Our community</p><h2>Learning in action.</h2></div><p>Explore our collaborations, projects, and talented candidates.</p></div>
+      <div id="gallery-sections" class="gallery-sections" aria-live="polite"></div>
+    </section>
 
-    <section id="contact" class="contact-section page-section" aria-labelledby="contact-title">
-      <div>
-        <p class="eyebrow">Contact</p>
-        <h2 id="contact-title">Contact Details</h2>
-        <p class="contact-intro">
-          Replace these details with your real business, personal, or project contact information.
-        </p>
+    <section id="contact" class="contact">
+      <div class="contact-content"><p class="eyebrow">Let’s connect</p><h2>Ready to take the next step?</h2><p>Talk with our team about training, projects, and placement support.</p></div>
+      <div class="contact-links">
+        <a href="tel:+919876543210"><span>Call us</span><strong>+91 98765 43210</strong></a>
+        <a href="mailto:hello@example.com"><span>Email us</span><strong>hello@example.com</strong></a>
       </div>
-
-      <address class="contact-grid">
-        <a href="tel:+919876543210">
-          <span>Phone</span>
-          +91 98765 43210
-        </a>
-        <a href="mailto:hello@example.com">
-          <span>Email</span>
-          hello@example.com
-        </a>
-        <a href="https://github.com/" target="_blank" rel="noreferrer">
-          <span>GitHub</span>
-          github.com/your-name
-        </a>
-        <p>
-          <span>Location</span>
-          India
-        </p>
-      </address>
     </section>
   </main>
 
-  <script src="script.js?v=20260713-restore"></script>
+  <footer><span>© <span id="year"></span> Robotic Tech System</span><a href="#home">Back to top ↑</a></footer>
+  <dialog id="image-dialog"><button type="button" class="dialog-close" aria-label="Close image">×</button><img src="" alt=""><p></p></dialog>
+  <script src="script.js?v=20260713-redesign"></script>
 </body>
 
 </html>
