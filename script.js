@@ -32,7 +32,11 @@ function readableName(file) {
 }
 
 async function renderGalleries() {
-  const galleries = await getDriveGalleries() || await getLocalGalleries();
+  if (!galleryRoot.children.length) {
+    galleryRoot.innerHTML = '<p class="gallery-loading">Preparing gallery images…</p>';
+  }
+  const sourceGalleries = await getDriveGalleries() || await getLocalGalleries();
+  const galleries = await preloadGalleries(sourceGalleries);
   renderDriveMenu(galleries);
   galleryRoot.innerHTML = galleries.map(({ title, images }) => {
     const id = `gallery-${slugify(title)}`;
@@ -43,6 +47,24 @@ async function renderGalleries() {
     return `<section id="${id}" class="drive-gallery"><div class="gallery-group-header"><h3>${title}</h3><span>${images.length} images</span></div><div class="marquee-window"><div class="marquee-track">${imageButtons}</div></div></section>`;
   }).join("");
   startMarquees();
+}
+
+async function preloadGalleries(galleries) {
+  const results = await Promise.all(galleries.map(async (gallery) => {
+    const imageResults = await Promise.all(gallery.images.map(({ source }) => preloadImage(source)));
+    return imageResults.every(Boolean) ? gallery : null;
+  }));
+  return results.filter(Boolean);
+}
+
+function preloadImage(source) {
+  return new Promise((resolve) => {
+    const image = new Image();
+    const timeout = window.setTimeout(() => resolve(false), 15000);
+    image.onload = () => { window.clearTimeout(timeout); resolve(true); };
+    image.onerror = () => { window.clearTimeout(timeout); resolve(false); };
+    image.src = source;
+  });
 }
 
 function startMarquees() {
