@@ -37,7 +37,7 @@ async function renderGalleries() {
   galleryRoot.innerHTML = galleries.map(({ title, images }) => {
     const id = `gallery-${slugify(title)}`;
     if (!images.length) return `<section><div class="gallery-group-header"><h3>${title}</h3></div><p class="gallery-empty">Images will appear here soon.</p></section>`;
-    const imageButtons = [...images, ...images].map(({ source, name }) => {
+    const imageButtons = images.map(({ source, name }) => {
       return `<button class="gallery-image" type="button" data-source="${source}" data-caption="${name}" aria-label="Open ${name}"><img src="${source}" alt="${name}" loading="eager"></button>`;
     }).join("");
     return `<section id="${id}" class="drive-gallery"><div class="gallery-group-header"><h3>${title}</h3><span>${images.length} images</span></div><div class="marquee-window"><div class="marquee-track">${imageButtons}</div></div></section>`;
@@ -52,21 +52,9 @@ function startMarquees() {
   document.querySelectorAll(".marquee-track").forEach((track) => {
     const windowElement = track.closest(".marquee-window");
     const cards = Array.from(track.querySelectorAll(".gallery-image"));
-    const originalCount = Math.floor(cards.length / 2);
+    const originalCount = cards.length;
     const firstCard = cards[0];
     if (!windowElement || !firstCard || !originalCount) return;
-
-    track.querySelectorAll("img").forEach((image) => {
-      image.addEventListener("error", () => {
-        const failedSource = image.getAttribute("src");
-        track.querySelectorAll("img").forEach((candidate) => {
-          if (candidate.getAttribute("src") === failedSource) {
-            candidate.closest(".gallery-image")?.remove();
-          }
-        });
-        if (track.isConnected) startMarquees();
-      }, { once: true });
-    });
 
     let current = 0;
     const moveToCenter = (animate) => {
@@ -81,13 +69,14 @@ function startMarquees() {
     const advance = () => {
       if (!track.isConnected) return;
       current += 1;
-      moveToCenter(true);
-      if (current === originalCount) {
+      if (current >= originalCount) {
         const resetTimer = window.setTimeout(() => {
           current = 0;
           moveToCenter(false);
-        }, 750);
+        }, 700);
         marqueeTimers.push(resetTimer);
+      } else {
+        moveToCenter(true);
       }
       marqueeTimers.push(window.setTimeout(advance, 5750));
     };
